@@ -73,17 +73,7 @@
         .branding-link-mobile:hover{color: var(--primary);}
         
         /* MODIFIED: Mark button styles adjusted for an even smaller box area */
-#inline-mark-btn { 
-    height: 40px;           /* <<< ऊंचाई को 44px से 40px किया */
-    padding: 0 8px;         /* <<< साइड की स्पेसिंग को 12px से 8px किया */
-    font-size: 0.8rem;      /* <<< टेक्स्ट का साइज भी थोड़ा कम किया */
-    flex-grow: 1; 
-    margin: 0 8px; 
-    border-color: var(--secondary); 
-    color: var(--secondary); 
-    max-width: 100px;       /* <<< अधिकतम चौड़ाई को 130px से 100px किया */
-    display: none; 
-}
+        #inline-mark-btn { height: 40px; padding: 0 8px; font-size: 0.8rem; flex-grow: 1; margin: 0 8px; border-color: var(--secondary); color: var(--secondary); max-width: 100px; display: none; }
         #inline-mark-btn.marked { border-color: var(--accent); color: var(--accent); font-weight: 600; }
         
         #floating-mark-btn { height:44px; padding: 0 12px; font-size: 0.85rem; position: fixed; bottom: 88px; left: 50%; transform: translateX(-50%); z-index: 850; display: none; background-color: var(--card-bg); border-color: var(--secondary); color: var(--secondary); box-shadow: 0 -2px 10px rgba(0,0,0,.1); }
@@ -100,6 +90,8 @@
         .question-card{border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);border:1px solid transparent;overflow:hidden}
         .question-counter{font-size:.9rem;color:var(--gray);text-align:center;margin-bottom:16px;font-weight:500}
         .question-text{font-size:1.1rem;line-height:1.6;margin-bottom:20px;color:var(--dark);overflow-wrap:break-word;word-wrap:break-word}
+        .question-image-container { text-align: center; margin-bottom: 20px; }
+        .question-image { max-width: 100%; max-height: 250px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,.1); }
         .lang-toggle-container{display:flex;justify-content:center;margin-bottom:20px;background-color:var(--light-gray);border-radius:12px;padding:4px}
         .lang-toggle-btn{flex:1;text-align:center;padding:8px 12px;border:none;background:0 0;cursor:pointer;border-radius:10px;font-weight:500;color:var(--secondary);transition:all .3s ease}
         .lang-toggle-btn.active{background-color:var(--card-bg);color:var(--primary);box-shadow:0 2px 5px rgba(0,0,0,.1)}
@@ -117,6 +109,7 @@
         .review-mode .option-input:checked+.option-label.incorrect::after{background:var(--danger)}
         .solution-container{margin-top:20px;padding:16px;border-radius:12px;border-left:3px solid var(--primary)}
         .solution-title{font-weight:600;margin-bottom:8px;color:var(--primary)}
+        .solution-text{font-size:1rem;line-height:1.7}
         .time-taken-info{font-size:.8rem;color:var(--secondary);font-style:italic;margin-top:10px}
         
         /* --- Question Navigator (Sidebar) --- */
@@ -288,6 +281,7 @@
             setRandomBackground();
             loadTest().then(() => {
                 initializeTest(); 
+                if (loadProgress()) return; // If progress is loaded, it will handle the UI.
                 handleResize(); 
                 window.addEventListener('resize', handleResize);
                 history.replaceState({page: 'instructions'}, 'Instructions', '#instructions'); 
@@ -366,10 +360,11 @@
             userName = document.getElementById('user-name-input').value.trim();
             userMobile = document.getElementById('user-mobile-input').value.trim();
             if (!userName) { alert('Please enter your name.'); return; }
-            if (!userMobile || !/^\d{10}$/.test(userMobile)) { alert('Please enter a valid 10-digit mobile number.'); return; }
+            if (!/^\d{10}$/.test(userMobile)) { alert('Please enter a valid 10-digit mobile number.'); return; }
             
             localStorage.setItem('userName', userName);
             localStorage.setItem('userMobile', userMobile);
+            localStorage.removeItem('testProgress'); // Clear any old progress before starting fresh
             document.body.style.overflow = '';
             document.getElementById('user-details-modal').classList.remove('show');
             
@@ -411,7 +406,8 @@
             updateMarkForReviewUI();
 
             let langToggleHTML = `<div class="lang-toggle-container"><button class="lang-toggle-btn ${currentLang === 'en' ? 'active' : ''}" onclick="toggleLanguage('en')">English</button><button class="lang-toggle-btn ${currentLang === 'hi' ? 'active' : ''}" onclick="toggleLanguage('hi')">हिंदी</button></div>`;
-            let html = `<div class="question-card">${langToggleHTML}<div class="question-text"><div class="en">${question.question_en.replace(/\n/g, '<br>')}</div><div class="hi" style="display:none">${question.question_hi.replace(/\n/g, '<br>')}</div></div><div class="options" id="options-container">`;
+            let imageHTML = question.image_url ? `<div class="question-image-container"><img src="${question.image_url}" alt="Question Image" class="question-image"></div>` : '';
+            let html = `<div class="question-card">${langToggleHTML}<div class="question-text"><div class="en">${question.question_en.replace(/\n/g, '<br>')}</div><div class="hi" style="display:none">${question.question_hi.replace(/\n/g, '<br>')}</div></div>${imageHTML}<div class="options" id="options-container">`;
             const options = ['a', 'b', 'c', 'd'];
             (question.options_en || []).forEach((opt_label, i) => {
                 let optionClass = ''; let isUserAnswer = answers[question.id] === options[i];
@@ -444,15 +440,15 @@
         function updateProgress() { document.getElementById('attempted-count').textContent = Object.keys(answers).length; }
 
         function startTimer() {
-            const timerDisplay = document.getElementById('timer-display'); 
             let timeLeft = totalTime;
             timerInterval = setInterval(() => {
                 if (timeLeft <= 0 || submitted) { clearInterval(timerInterval); if (!submitted) submitTest(); return; }
                 timeLeft--;
-                const minutes = Math.floor((timeLeft % 3600) / 60);
+                const minutes = Math.floor(timeLeft / 60);
                 const seconds = timeLeft % 60;
-                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                document.getElementById('timer-display').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             }, 1000);
+            setInterval(saveProgress, 5000); // Save progress every 5 seconds
         }
 
         // --- Mark for Review Logic ---
@@ -482,6 +478,7 @@
         function confirmSubmit(){if(submitted)return;stopAndRecordTime();const e=Object.keys(answers).length;const t=document.createElement("div");t.className="results-modal show",t.innerHTML=`<div class="results-card"><h4 class="mb-3">Confirm Submission</h4><p class="text-secondary mb-4">You have attempted ${e} of ${totalQuestions} questions.<br>Are you sure you want to submit?</p><div class="d-flex justify-content-center gap-2"><button onclick="startQuestionTimer(); this.closest('.results-modal').remove()" class="btn btn-outline-secondary">Cancel</button><button onclick="submitTest(); this.closest('.results-modal').remove()" class="btn btn-primary">Submit Test</button></div></div>`,document.body.appendChild(t)}
         function submitTest() {
             if (submitted) return; 
+            localStorage.removeItem('testProgress');
             submitted = true; 
             clearInterval(timerInterval);
             stopAndRecordTime();
@@ -518,6 +515,73 @@
         function reviewTest(){document.getElementById("results-modal").classList.remove("show"),document.getElementById("floating-pdf-btn").style.display="flex",showQuestion(0)}
         window.addEventListener('click', e => { if (e.target.classList.contains('results-modal')) e.target.classList.remove('show'); });
         document.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') prevQuestion(); if (e.key === 'ArrowRight') nextQuestion(); });
+
+        // --- PROGRESS SAVING & LOADING ---
+        function saveProgress() {
+            if (!testStarted || submitted) return;
+            let timeLeft = 0;
+            const timerDisplay = document.getElementById('timer-display').textContent;
+            if (timerDisplay) {
+                const parts = timerDisplay.split(':');
+                if (parts.length === 2) {
+                    timeLeft = parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+                }
+            }
+            const progress = {
+                userName: userName,
+                userMobile: userMobile,
+                answers: answers,
+                timeLeft: timeLeft,
+                currentQuestion: currentQuestion,
+                markedForReview: markedForReview,
+                timeSpent: timeSpent,
+                testId: new URLSearchParams(window.location.search).get('test')
+            };
+            localStorage.setItem('testProgress', JSON.stringify(progress));
+        }
+
+        function loadProgress() {
+            const savedProgress = localStorage.getItem('testProgress');
+            if (savedProgress) {
+                const progress = JSON.parse(savedProgress);
+                const currentTestId = new URLSearchParams(window.location.search).get('test');
+                
+                if (progress.testId === currentTestId) {
+                    if (confirm("Welcome back! It looks like you have an unfinished test. Do you want to resume?")) {
+                        userName = progress.userName || localStorage.getItem('userName') || '';
+                        userMobile = progress.userMobile || localStorage.getItem('userMobile') || '';
+                        answers = progress.answers || {};
+                        markedForReview = progress.markedForReview || {};
+                        timeSpent = progress.timeSpent || {};
+                        totalTime = progress.timeLeft || totalTime; 
+                        
+                        testStarted = true;
+                        history.pushState({page: 'test'}, 'Test In Progress', '#test');
+                        showTestUI();
+                        startTimer();
+                        window.addEventListener('beforeunload', beforeUnloadHandler);
+                        
+                        updateProgress();
+                        Object.keys(answers).forEach(qId => {
+                            const qIndex = questions.findIndex(q => q.id === qId);
+                            if (qIndex !== -1) document.getElementById(`box-${qIndex}`).classList.add('attempted');
+                        });
+                        Object.keys(markedForReview).forEach(qId => {
+                             const qIndex = questions.findIndex(q => q.id === qId);
+                             if (qIndex !== -1 && markedForReview[qId]) document.getElementById(`box-${qIndex}`).classList.add('marked');
+                        });
+
+                        showQuestion(progress.currentQuestion || 0);
+                        return true; 
+                    } else {
+                        localStorage.removeItem('testProgress');
+                    }
+                } else {
+                    localStorage.removeItem('testProgress');
+                }
+            }
+            return false;
+        }
 
         // --- UTILITIES (TELEGRAM & PDF) ---
         async function sendToTelegramLog(e){if(!BOT_TOKEN||!CHAT_ID)return void console.warn("Telegram API credentials are not set. Logging is disabled.");const t=`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;let o="";const n=document.title,s=new Date().toLocaleString("en-IN",{timeZone:"Asia/Kolkata"});"Test Started"===e.type?o=`🔴 *New Test Started!*\n\n- *User:* \`${e.userName||"N/A"}\`\n- *Mobile:* \`${e.userMobile||"N/A"}\`\n- *Test:* \`${n}\`\n- *Time:* \`${s}\``:"Test Submitted"===e.type&&(o=`✅ *Test Submitted!*\n\n- *User:* \`${e.userName||"N/A"}\`\n- *Mobile:* \`${e.userMobile||"N/A"}\`\n- *Test:* \`${n}\`\n- *Score:* *${e.score}*\n- *Correct:* ${e.correct}\n- *Incorrect:* ${e.incorrect}\n- *Unattempted:* ${e.unattempted}\n- *Time:* \`${s}\``);try{await fetch(t,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:CHAT_ID,text:o,parse_mode:"Markdown"})})}catch(e){console.error("Telegram log failed:",e)}}
