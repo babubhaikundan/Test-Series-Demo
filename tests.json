@@ -36,7 +36,7 @@
       "gen_science": { "name": "General Science", "tests": [] },
       "gen_awareness": { "name": "General Awareness", "tests": [] },
       "reasoning": { "name": "Reasoning", "tests": [{ "name": "Reasoning test 1", "file": "test-runner.html?test=1"}] },
-      "maths": { "name": "Maths", "tests": [{"name": "Checker Test 1", "file": "test-runner.html?test=2"}] },
+      "maths": { "name": "Maths", "tests": [{"name": "Checker 1", "file": "test-runner.html?test=2"}] },
       "hindi": { "name": "Hindi", "tests": [] },
       "english": { "name": "English", "tests": [] }
     }
