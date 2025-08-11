@@ -1,0 +1,29 @@
+{
+  "title": "Checker Test 1",
+  "time": 15,
+  "questions": [
+    {"id":"Q1","question_en":"Select the correct mirror image of 'PQ4R2'.","question_hi":"दिए गए संयोजन 'PQ4R2' की सही दर्पण छवि चुनें।","options_en":["A","B","C","D"],"options_hi":["A","B","C","D"],"solution_en":"Characters will be laterally inverted.","solution_hi":"अक्षर पार्श्व रूप से उल्टे होंगे।","correct":"c","pos_marks":1,"neg_marks":0.25},
+    {"id":"Q2","question_en":"A girl walks 10 km N, left 5 km, left 10 km. Position?","question_hi":"लड़की 10 किमी उत्तर, बाएँ 5 किमी, बाएँ 10 किमी चलती है। स्थिति?","options_en":["5 km E","5 km W","10 km E","10 km W"],"options_hi":["5 किमी पूर्व","5 किमी पश्चिम","10 किमी पूर्व","10 किमी पश्चिम"],"solution_en":"5 km west.","solution_hi":"5 किमी पश्चिम।","correct":"b","pos_marks":1,"neg_marks":0.25},
+    {"id":"Q3","question_en":"2, 6, 12, 20, ?","question_hi":"2, 6, 12, 20, ?","options_en":["28","30","32","36"],"options_hi":["28","30","32","36"],"solution_en":"+4,+6,+8,+10 → 30.","solution_hi":"+4,+6,+8,+10 → 30।","correct":"b","pos_marks":1,"neg_marks":0.25},
+    {"id":"Q4","question_en":"If CAT=3120, DOG=4157, then BAT=?","question_hi":"यदि CAT=3120, DOG=4157, तो BAT=?","options_en":["2120","3119","2130","3220"],"options_hi":["2120","3119","2130","3220"],"solution_en":"Code as per letter positions.","solution_hi":"अक्षर मान के अनुसार।","correct":"a","pos_marks":1,"neg_marks":0.25},
+    {"id":"Q5","question_en":"Order: Zebra, Apple, Mango, Banana.","question_hi":"क्रम: Zebra, Apple, Mango, Banana.","options_en":["A,B,M,Z","A,M,B,Z","B,A,M,Z","M,A,B,Z"],"options_hi":["A,B,M,Z","A,M,B,Z","B,A,M,Z","M,A,B,Z"],"solution_en":"Apple→Banana→Mango→Zebra.","solution_hi":"Apple→Banana→Mango→Zebra।","correct":"a","pos_marks":1,"neg_marks":0.25},
+    {"id":"Q6","question_en":"Odd one: 2, 6, 12, 20, 30, 42","question_hi":"विषम संख्या: 2, 6, 12, 20, 30, 42","options_en":["20","30","42","12"],"options_hi":["20","30","42","12"],"solution_en":"n(n+1) except 20.","solution_hi":"n(n+1) सिवाय 20।","correct":"a","pos_marks":1,"neg_marks":0.25},
+    {"id":"Q7","question_en":"Value sum of QUIZ?","question_hi":"QUIZ का मान योग?","options_en":["64","72","74","78"],"options_hi":["64","72","74","78"],"solution_en":"17+21+9+26=73.","solution_hi":"17+21+9+26=73।","correct":"-","pos_marks":1,"neg_marks":0.25},
+    {"id":"Q8","question_en":"Which figure completes series?","question_hi":"कौन-सा चित्र श्रृंखला पूरी करेगा?","options_en":["A","B","C","D"],"options_hi":["A","B","C","D"],"solution_en":"Rotation pattern.","solution_hi":"घूर्णन पैटर्न।","correct":"d","pos_marks":1,"neg_marks":0.25},
+    {"id":"Q9","question_en":"He is my father's only son. Relation?","question_hi":"वह मेरे पिता का इकलौता बेटा है। रिश्ता?","options_en":["Brother","Father","Uncle","Cousin"],"options_hi":["भाई","पिता","चाचा","चचेरा भाई"],"solution_en":"Brother.","solution_hi":"भाई।","correct":"a","pos_marks":1,"neg_marks":0.25},
+    {"id":"Q10","question_en":"5+3=28, 7+2=63, 6+4=50, 8+5=?","question_hi":"5+3=28, 7+2=63, 6+4=50, 8+5=?","options_en":["80","90","100","110"],"options_hi":["80","90","100","110"],"solution_en":"(a+b)×a=104.","solution_hi":"(a+b)×a=104।","correct":"-","pos_marks":1,"neg_marks":0.25},
+    {"id":"Q11","question_en":"5th right of 12th from left?","question_hi":"बाएँ से 12वें के दाएँ 5वाँ?","options_en":["R","S","T","U"],"options_hi":["R","S","T","U"],"solution_en":"L→Q.","solution_hi":"L→Q।","correct":"-","pos_marks":1,"neg_marks":0.25},
+    {"id":"Q12","question_en":"3, 9, 27, 81, ?","question_hi":"3, 9, 27, 81, ?","options_en":["162","243","324","729"],"options_hi":["162","243","324","729"],"solution_en":"×3 → 243.","solution_hi":"×3 → 243।","correct":"b","pos_marks":1,"neg_marks":0.25},
+  ]
+}
+{
+  "title": "Checke 2 test",
+  "time": 15,
+  "questions": [
+    {"id":"Q1","question_en":"Select the correct mirror image of 'PQ4R2'.","question_hi":"दिए गए संयोजन 'PQ4R2' की सही दर्पण छवि चुनें।","options_en":["A","B","C","D"],"options_hi":["A","B","C","D"],"solution_en":"Characters will be laterally inverted.","solution_hi":"अक्षर पार्श्व रूप से उल्टे होंगे।","correct":"c","pos_marks":1,"neg_marks":0.25},
+    {"id":"Q2","question_en":"A girl walks 10 km N, left 5 km, left 10 km. Position?","question_hi":"लड़की 10 किमी उत्तर, बाएँ 5 किमी, बाएँ 10 किमी चलती है। स्थिति?","options_en":["5 km E","5 km W","10 km E","10 km W"],"options_hi":["5 किमी पूर्व","5 किमी पश्चिम","10 किमी पूर्व","10 किमी पश्चिम"],"solution_en":"5 km west.","solution_hi":"5 किमी पश्चिम।","correct":"b","pos_marks":1,"neg_marks":0.25},
+    {"id":"Q3","question_en":"2, 6, 12, 20, ?","question_hi":"2, 6, 12, 20, ?","options_en":["28","30","32","36"],"options_hi":["28","30","32","36"],"solution_en":"+4,+6,+8,+10 → 30.","solution_hi":"+4,+6,+8,+10 → 30।","correct":"b","pos_marks":1,"neg_marks":0.25},
+    {"id":"Q4","question_en":"If CAT=3120, DOG=4157, then BAT=?","question_hi":"यदि CAT=3120, DOG=4157, तो BAT=?","options_en":["2120","3119","2130","3220"],"options_hi":["2120","3119","2130","3220"],"solution_en":"Code as per letter positions.","solution_hi":"अक्षर मान के अनुसार।","correct":"a","pos_marks":1,"neg_marks":0.25},
+    {"id":"Q5","question_en":"Order: Zebra, Apple, Mango, Banana.","question_hi":"क्रम: Zebra, Apple, Mango, Banana.","options_en":["A,B,M,Z","A,M,B,Z","B,A,M,Z","M,A,B,Z"],"options_hi":["A,B,M,Z","A,M,B,Z","B,A,M,Z","M,A,B,Z"],"solution_en":"Apple→Banana→Mango→Zebra.","solution_hi":"Apple→Banana→Mango→Zebra।","correct":"a","pos_marks":1,"neg_marks":0.25},
+   ]
+   }

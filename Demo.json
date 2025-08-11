@@ -1,0 +1,30 @@
+{
+  "title": "Reasoning Test 1 (50Q)",
+  "time": 40,
+  "questions": [
+    {
+      "id": "Q1",
+      "question_en": "1. Select the correct mirror image...",
+      "question_hi": "1. दिए गए संयोजन की सही दर्पण छवि...",
+      "options_en": ["Option A", "Option B", "Option C", "Option D"],
+      "options_hi": ["विकल्प A", "विकल्प B", "विकल्प C", "विकल्प D"],
+      "solution_en": "The characters will be laterally inverted...",
+      "solution_hi": "अक्षर पार्श्व रूप से उल्टे हो जाएंगे...",
+      "correct": "c",
+      "pos_marks": 1,
+      "neg_marks": 0.25
+    },
+    {
+      "id": "Q2",
+      "question_en": "2. A girl starts from her house...",
+      "question_hi": "2. एक लड़की अपने घर से चलना शुरू करती है...",
+      "options_en": ["15 km, south", "15 km, west", "15 km, north", "15 km, east"],
+      "options_hi": ["15 किमी, दक्षिण", "15 किमी, पश्चिम", "15 किमी, उत्तर", "15 किमी, पूर्व"],
+      "solution_en": "Let her home be at (0,0). Path...",
+      "solution_hi": "मान लीजिए उसका घर (0,0) पर है। पथ...",
+      "correct": "b",
+      "pos_marks": 1,
+      "neg_marks": 0.25
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "ssc_je": {
+    "name": "SSC JE Tech Paper (Civil)",
+    "subjects": {
+      "bmc": { "name": "Building Materials (BMC)", "tests": [] },
+      "estimating": { "name": "Estimating and Costing", "tests": [] },
+      "surveying": { "name": "Surveying", "tests": [{ "name": "Surveying Test 1", "file": "tests/Surveying 1.html" }] },
+      "soil": { "name": "Soil Mechanics", "tests": [] },
+      "hydrology": { "name": "Hydrology", "tests": [] },
+      "irrigation": { "name": "Irrigation Engineering", "tests": [] },
+      "transportation": { "name": "Transportation Engineering", "tests": [] },
+      "evs": { "name": "Environmental Engineering (EVS)", "tests": [] },
+      "som": { "name": "Strength of Materials (SOM)", "tests": [] },
+      "concrete": { "name": "Concrete Technology", "tests": [] },
+      "rcc": { "name": "RCC Design", "tests": [] },
+      "steel": { "name": "Steel Design", "tests": [] },
+      "fm": { "name": "Fluid Mechanics", "tests": [] },
+      "tos": { "name": "Theory of Structures (TOS)", "tests": [] },
+      "eng_mech": { "name": "Engineering Mechanics", "tests": [] }
+    }
+  },
+  "ssc_non_tech_paper": {
+    "name": "SSC Non Tech Paper",
+    "subjects": {
+      "gen_science": { "name": "General Science", "tests": [] },
+      "gen_awareness": { "name": "General Awareness", "tests": [{ "name": "General Awareness 1", "file": "test-runner.html?test=General Awareness 1" }] },
+      "reasoning": { "name": "Reasoning", "tests": [{ "name": "Reasoning Test 1", "file": "tests/Reasoning 1.html" }] },
+      "maths": { "name": "Maths", "tests": [{ "name": "Maths Test 1", "file": "tests/Math 1.html" }] },
+      "hindi": { "name": "Hindi", "tests": [] },
+      "english": { "name": "English", "tests": [] }
+    }
+  },
+  "banking": {
+    "name": "Banking Exams (IBPS, SBI)",
+    "subjects": {
+      "gen_science": { "name": "General Science", "tests": [] },
+      "gen_awareness": { "name": "General Awareness", "tests": [] },
+      "reasoning": { "name": "Reasoning", "tests": [{ "name": "Reasoning test 1", "file": "test-runner.html?test=1"}] },
+      "maths": { "name": "Maths", "tests": [{"name": "Checker Test 1", "file": "test-runner.html?test=2"}] },
+      "hindi": { "name": "Hindi", "tests": [] },
+      "english": { "name": "English", "tests": [] }
+    }
+  },
+  "railways": {
+    "name": "Railway Exams (RRB)",
+    "subjects": {
+      "gen_science": { "name": "General Science", "tests": [] },
+      "gen_awareness": { "name": "General Awareness", "tests": [] },
+      "reasoning": { "name": "Reasoning", "tests": [] },
+      "maths": { "name": "Maths", "tests": [] },
+      "hindi": { "name": "Hindi", "tests": [] },
+      "english": { "name": "English", "tests": [] }
+    }
+  }
+}
