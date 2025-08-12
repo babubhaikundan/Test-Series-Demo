@@ -96,6 +96,12 @@
             color: #f0f0f0; /* Slightly off-white text for better feel */
             box-shadow: 0 2px 8px rgba(211, 84, 0, 0.2);
         }
+                /* CHANGE for Selected Language Button in Dark Mode */
+        body.dark-mode .lang-toggle-btn.active {
+            background-color: var(--dark); /* Using the dark text color variable for a near-black look */
+            color: var(--body-bg); /* Making the text color same as background for contrast */
+            box-shadow: 0 2px 5px rgba(0,0,0,.2);
+        }
         /* --- Main Test UI: Question & Options --- */
         .main-content{padding:16px;padding-bottom: 20px;}
         .question-card,.results-card,.question-nav{background:var(--card-bg);transition:background-color .3s}
