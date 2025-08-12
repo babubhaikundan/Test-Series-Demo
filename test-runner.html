@@ -67,6 +67,17 @@
         .control-btn:hover{background:rgba(255,255,255,.2)}
         .submit-btn-header{height:34px;padding:0 10px;font-size:0.8rem;border-radius:17px}
         .submit-btn-header.submitted-state{padding:0;width:34px;background-color:var(--success);border-color:var(--success);cursor:default}
+                @keyframes blink-animation {
+            0% { background-color: var(--danger); transform: scale(1); box-shadow: 0 0 5px var(--danger); }
+            50% { background-color: #ff7675; transform: scale(1.05); box-shadow: 0 0 15px #ff7675; }
+            100% { background-color: var(--danger); transform: scale(1); box-shadow: 0 0 5px var(--danger); }
+        }
+
+        .submit-btn-header.blinking {
+            animation: blink-animation 1.5s infinite;
+            border-color: #fff;
+            color: #fff;
+        }                                                                                                           }
         .submit-btn-header:hover:not(.submitted-state){background:rgba(255,255,255,.25)}
         .timer-display{background:rgba(0,0,0,.2);border-radius:18px;padding:4px 10px;font-size:.8rem;font-weight:500;display:flex;align-items:center;flex-shrink:0}
         .timer-display i{margin-right:6px}
@@ -468,20 +479,35 @@
         function toggleNav(show) { const nav = document.getElementById('question-nav'); const overlay = document.getElementById('nav-overlay'); if (show === undefined) show = !nav.classList.contains('show'); nav.classList.toggle('show', show); overlay.classList.toggle('show', show); if (window.innerWidth < 992) document.body.style.overflow = show ? 'hidden' : ''; }
         function updateProgress() { document.getElementById('attempted-count').textContent = Object.keys(answers).length; }
 
-        function startTimer() {
+                function startTimer() {
             let timeLeft = totalTime;
             const timerDisplay = document.getElementById('timer-display');
+            const submitBtn = document.getElementById('submit-btn-header'); // Get the submit button
+
             timerDisplay.textContent = `${Math.floor(timeLeft / 60).toString().padStart(2, '0')}:${(timeLeft % 60).toString().padStart(2, '0')}`;
 
             timerInterval = setInterval(() => {
-                if (timeLeft <= 0 || submitted) { clearInterval(timerInterval); if (!submitted) submitTest(); return; }
+                if (timeLeft <= 0 || submitted) {
+                    clearInterval(timerInterval);
+                    if (submitBtn) submitBtn.classList.remove('blinking'); // Stop blinking on submit
+                    if (!submitted) submitTest();
+                    return;
+                }
                 timeLeft--;
+
+                // --- BLINKING LOGIC ---
+                // Start blinking when 30 seconds are left
+                if (timeLeft === 30 && !submitted) {
+                    if (submitBtn) submitBtn.classList.add('blinking');
+                }
+                // --- END BLINKING LOGIC ---
+
                 const minutes = Math.floor(timeLeft / 60);
                 const seconds = timeLeft % 60;
                 timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             }, 1000);
             setInterval(saveProgress, 5000); 
-        }
+                }
 
         // --- Mark for Review Logic ---
         function markQuestionForReview() {
@@ -509,6 +535,7 @@
         function confirmSubmit(){if(submitted)return;stopAndRecordTime();const e=Object.keys(answers).length;const t=document.createElement("div");t.className="results-modal show",t.innerHTML=`<div class="results-card" style="margin: auto;"><h4 class="mb-3">Confirm Submission</h4><p class="text-secondary mb-4">You have attempted ${e} of ${totalQuestions} questions.<br>Are you sure you want to submit?</p><div class="d-flex justify-content-center gap-2"><button onclick="startQuestionTimer(); this.closest('.results-modal').remove()" class="btn btn-outline-secondary">Cancel</button><button onclick="submitTest(); this.closest('.results-modal').remove()" class="btn btn-primary">Submit Test</button></div></div>`,document.body.appendChild(t)}
         
         function submitTest() {
+                        document.getElementById('submit-btn-header')?.classList.remove('blinking');
             if (submitted) return; 
             localStorage.removeItem('testProgress');
             submitted = true; 
