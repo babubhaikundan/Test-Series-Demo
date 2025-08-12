@@ -84,15 +84,15 @@
         #section-tabs-container { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px; }
         .section-tab { padding: 8px 16px; border-radius: 50px; background: var(--light-gray); color: var(--secondary); font-weight: 500; cursor: pointer; transition: all 0.3s; white-space: nowrap; border: none; }
                 /* FOR LIGHT MODE: Bright and Punchy Orange */
-        body.dark-mode .section-tab.active {
-            background: #e67e22; /* Bright Orange */
+        .section-tab.active {
+            background: #e67919; /* Bright Orange */
             color: #fff;
             box-shadow: 0 2px 8px rgba(230, 126, 34, 0.4);
         }
 
         /* FOR DARK MODE: Softer, Less Saturated Orange */
-        .section-tab.active {
-            background: #d35400; /* Deeper/Duller Orange */
+        body.dark-mode .section-tab.active {
+            background: #662900; /* Deeper/Duller Orange */
             color: #f0f0f0; /* Slightly off-white text for better feel */
             box-shadow: 0 2px 8px rgba(211, 84, 0, 0.2);
         }
