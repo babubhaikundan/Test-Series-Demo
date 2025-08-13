@@ -173,13 +173,13 @@
         .user-details-card .form-control{width:100%;padding:12px;border:1px solid var(--light-gray);border-radius:8px;font-size:1rem;color:var(--dark);background-color:var(--body-bg);transition:border-color .3s,box-shadow .3s}
         .user-details-card .form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(0,123,255,.25);outline:none}
         .user-details-card .btn-proceed{width:100%;padding:12px;font-size:1rem;font-weight:500;border-radius:10px;margin-top:20px}
-                .pdf-generating-overlay {
+                        .pdf-generating-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            width: 100vw; /* Use viewport width */
+            height: 100vh; /* Use viewport height */
+            background: rgba(0, 0, 0, 0.75);
             z-index: 9999;
             display: flex;
             flex-direction: column;
@@ -187,12 +187,10 @@
             align-items: center;
             color: #fff;
             font-family: 'Poppins', sans-serif;
-        }
-        .pdf-generating-overlay .spinner-border {
-            width: 3rem;
-            height: 3rem;
-            margin-bottom: 15px;
-        }
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box; /* Ensures padding is included in width/height */
+                        }
         #floating-pdf-btn{position:fixed;bottom:100px;right:20px;width:60px;height:60px;border-radius:50%;background-color:var(--success);color:#fff;border:none;box-shadow:0 4px 15px rgba(0,0,0,.2);display:none;align-items:center;justify-content:center;font-size:1.5rem;z-index:1050;transition:var(--transition)}
         #floating-pdf-btn:hover{transform:scale(1.1);background-color:#218838}
         
@@ -764,8 +762,30 @@
                         const questionText = q.question_hi || q.question_en;
                         const solutionText = q.solution_hi || q.solution_en;
                         const optionsArray = q.options_hi || q.options_en;
-                        let optionsHTML = '';
-                        optionsArray.forEach((opt, idx) => { optionsHTML += `<p style="margin:5px 0; font-family: sans-serif;">${String.fromCharCode(65 + idx)}) ${opt}</p>`; });
+                                                let optionsHTML = '';
+                        const userAnswer = answers[q.id];
+                        const correctAnswer = q.correct;
+                        const optionKeys = ['a', 'b', 'c', 'd'];
+
+                        optionsArray.forEach((opt, idx) => {
+                            const optionKey = optionKeys[idx];
+                            let style = 'margin:5px 0; font-family: sans-serif;';
+                            let prefix = `${String.fromCharCode(65 + idx)}) `;
+
+                            if (optionKey === correctAnswer) {
+                                // This is the correct answer
+                                style += ' color: green; font-weight: bold;';
+                                if (userAnswer === optionKey) {
+                                    prefix = `✓ ${prefix}`; // User answered correctly
+                                }
+                            } else if (optionKey === userAnswer) {
+                                // This is the incorrect answer selected by the user
+                                style += ' color: red;';
+                                prefix = `✗ ${prefix}`;
+                            }
+                            
+                            optionsHTML += `<p style="${style}">${prefix}${opt}</p>`;
+                        });           
                         const status = answers[q.id] ? (answers[q.id] === q.correct ? "Correct" : "Incorrect") : "Unattempted";
                         const time = timeSpent[q.id] || 0;
                         const minutes = Math.floor(time / 60); const seconds = time % 60;
