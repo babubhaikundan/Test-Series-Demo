@@ -689,7 +689,7 @@
         // --- UTILITIES (TELEGRAM & PDF) ---
         async function sendToTelegramLog(e){if(!BOT_TOKEN||!CHAT_ID)return void console.warn("Telegram API credentials are not set. Logging is disabled.");const t=`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;let o="";const n=testTitle,s=new Date().toLocaleString("en-IN",{timeZone:"Asia/Kolkata"});"Test Started"===e.type?o=`🔴 *New Test Started!*\n\n- *User:* \`${e.userName||"N/A"}\`\n- *Mobile:* \`${e.userMobile||"N/A"}\`\n- *Test:* \`${n}\`\n- *Time:* \`${s}\``:"Test Submitted"===e.type&&(o=`✅ *Test Submitted!*\n\n- *User:* \`${e.userName||"N/A"}\`\n- *Mobile:* \`${e.userMobile||"N/A"}\`\n- *Test:* \`${n}\`\n- *Score:* *${e.score}*\n- *Correct:* ${e.correct}\n- *Incorrect:* ${e.incorrect}\n- *Unattempted:* ${e.unattempted}\n- *Time:* \`${s}\``);try{await fetch(t,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:CHAT_ID,text:o,parse_mode:"Markdown"})})}catch(e){console.error("Telegram log failed:",e)}}
 
-                async function downloadPDF(e) {
+                 async function downloadPDF(e) {
             const btn = e;
             const originalHTML = btn.innerHTML;
             btn.disabled = true;
@@ -701,78 +701,96 @@
                 const fileName = `${testTitle} Result by Kundan.pdf`;
 
                 if (currentLang === 'hi') {
-                    // --- HINDI PDF LOGIC (Using html2canvas) ---
-                    alert("Generating Hindi PDF... This may take a moment as it involves rendering images.");
+                    // --- HINDI PDF LOGIC (html2canvas - Question by Question) ---
+                    alert("Generating Hindi PDF... This may take a moment.");
                     
-                    // Create a temporary container with all questions for screenshot
-                    const printableArea = document.createElement('div');
-                    printableArea.style.position = 'absolute';
-                    printableArea.style.left = '-9999px'; // Hide it off-screen
-                    printableArea.style.width = '700px'; // A4-like width
-                    printableArea.style.padding = '20px';
-                    printableArea.style.background = '#fff';
-                    printableArea.style.color = '#000';
-                    
-                    // Header Info
-                    let contentHTML = `
-                        <div style="text-align:center;">
-                            <h1>Test Analysis: ${testTitle}</h1>
-                            <p><strong>Developer: Kundan Yadav</strong></p>
-                            <hr>
-                            <p><strong>User:</strong> ${userName || "N/A"} | <strong>Mobile:</strong> ${userMobile || "N/A"}</p>
-                        </div>
-                        <hr>`;
-                    
-                    // Stats and Chart (as image)
-                    const scoreCardHTML = `<div style="display:flex; justify-content:space-around; text-align:center; margin:20px 0;">
-                        <div><h3>${document.getElementById("score-value").textContent}</h3><p>Score</p></div>
-                        <div><h3>${document.getElementById("correct-value").textContent}</h3><p>Correct</p></div>
-                        <div><h3>${document.getElementById("incorrect-value").textContent}</h3><p>Incorrect</p></div>
-                        <div><h3>${document.getElementById("unattempted-value").textContent}</h3><p>Unattempted</p></div>
-                    </div>`;
-                    const chartImage = document.getElementById("topicAnalysisChart").toDataURL("image/png", 1.0);
-                    contentHTML += scoreCardHTML + `<div style="text-align:center; margin:20px 0;"><img src="${chartImage}" style="width:100%; max-width:500px;" /></div><hr>`;
+                    const pdfWidth = doc.internal.pageSize.getWidth();
+                    const margin = 40;
+                    let yPosition = margin;
 
-                    // Questions loop
-                    questions.forEach((q, index) => {
+                    // --- Render Header and Stats First ---
+                    const headerContainer = document.createElement('div');
+                    headerContainer.style.width = '700px';
+                    headerContainer.style.padding = '20px';
+                    headerContainer.style.background = '#fff';
+                    headerContainer.style.color = '#000';
+                    let headerHTML = `
+                        <div style="text-align:center;">
+                            <h1>Test Analysis: ${testTitle}</h1><p><strong>Developer: Kundan Yadav</strong></p><hr>
+                            <p><strong>User:</strong> ${userName || "N/A"} | <strong>Mobile:</strong> ${userMobile || "N/A"}</p>
+                        </div><hr>
+                        <div style="display:flex; justify-content:space-around; text-align:center; margin:20px 0;">
+                            <div><h3>${document.getElementById("score-value").textContent}</h3><p>Score</p></div>
+                            <div><h3>${document.getElementById("correct-value").textContent}</h3><p>Correct</p></div>
+                            <div><h3>${document.getElementById("incorrect-value").textContent}</h3><p>Incorrect</p></div>
+                            <div><h3>${document.getElementById("unattempted-value").textContent}</h3><p>Unattempted</p></div>
+                        </div>
+                        <div style="text-align:center; margin:20px 0;"><img src="${document.getElementById("topicAnalysisChart").toDataURL("image/png", 1.0)}" style="width:100%; max-width:500px;" /></div>`;
+                    
+                    headerContainer.innerHTML = headerHTML;
+                    document.body.appendChild(headerContainer);
+                    
+                    const headerCanvas = await html2canvas(headerContainer, { scale: 2 });
+                    const headerImgData = headerCanvas.toDataURL('image/png');
+                    const headerImgHeight = (headerCanvas.height * (pdfWidth - 2 * margin)) / headerCanvas.width;
+                    doc.addImage(headerImgData, 'PNG', margin, yPosition, pdfWidth - 2 * margin, headerImgHeight);
+                    yPosition += headerImgHeight + 20;
+                    document.body.removeChild(headerContainer);
+
+                    // --- Loop through each question and render it ---
+                    for (let i = 0; i < questions.length; i++) {
+                        const q = questions[i];
+                        const questionContainer = document.createElement('div');
+                        questionContainer.style.width = '700px';
+                        questionContainer.style.padding = '20px';
+                        questionContainer.style.background = '#fff';
+                        questionContainer.style.color = '#000';
+                        
                         const questionText = q.question_hi || q.question_en;
                         const solutionText = q.solution_hi || q.solution_en;
                         const optionsArray = q.options_hi || q.options_en;
                         let optionsHTML = '';
-                        optionsArray.forEach((opt, i) => {
-                            optionsHTML += `<p style="margin:5px 0;">${String.fromCharCode(65 + i)}) ${opt}</p>`;
+                        optionsArray.forEach((opt, idx) => {
+                            optionsHTML += `<p style="margin:5px 0; font-family: sans-serif;">${String.fromCharCode(65 + idx)}) ${opt}</p>`;
                         });
                         const status = answers[q.id] ? (answers[q.id] === q.correct ? "Correct" : "Incorrect") : "Unattempted";
 
-                        contentHTML += `
-                            <div style="margin-top:20px; padding-top:10px; border-top: 1px solid #eee;">
-                                <h4>Q${index + 1}: ${questionText}</h4>
+                        questionContainer.innerHTML = `
+                            <hr>
+                            <div style="font-family: sans-serif;">
+                                <h4>Q${i + 1}: ${questionText}</h4>
                                 ${optionsHTML}
                                 <p><strong>Status:</strong> ${status}</p>
                                 <div style="background:#f0f8ff; padding:10px; border-radius:5px;">
                                     <strong>Solution:</strong> ${solutionText}
                                 </div>
                             </div>`;
-                    });
+                        
+                        document.body.appendChild(questionContainer);
+                        
+                        const qCanvas = await html2canvas(questionContainer, { scale: 2 });
+                        const qImgData = qCanvas.toDataURL('image/png');
+                        const qImgHeight = (qCanvas.height * (pdfWidth - 2 * margin)) / qCanvas.width;
 
-                    printableArea.innerHTML = contentHTML;
-                    document.body.appendChild(printableArea);
-
-                    const canvas = await html2canvas(printableArea, { scale: 2 });
-                    const imgData = canvas.toDataURL('image/png');
-                    const pdfWidth = doc.internal.pageSize.getWidth();
-                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                        // Check if it fits on the current page, if not, add a new page
+                        if (yPosition + qImgHeight > doc.internal.pageSize.getHeight() - margin) {
+                            doc.addPage();
+                            yPosition = margin;
+                        }
+                        
+                        doc.addImage(qImgData, 'PNG', margin, yPosition, pdfWidth - 2 * margin, qImgHeight);
+                        yPosition += qImgHeight + 10; // Add some space after each question
+                        
+                        document.body.removeChild(questionContainer);
+                    }
                     
-                    doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
                     doc.save(fileName);
-
-                    document.body.removeChild(printableArea);
 
                 } else {
                     // --- ENGLISH PDF LOGIC (Using jsPDF - Fast & Small) ---
+                    // This part remains unchanged
                     let s = 40;
                     const a = 40, i = doc.internal.pageSize.width - 2 * a, l = () => { doc.addPage(); s = a; };
-                    
                     doc.setFont("Helvetica", "bold"); doc.setFontSize(18); doc.text(`Test Analysis: ${testTitle}`, doc.internal.pageSize.width / 2, s, { align: "center" }); s += 25;
                     doc.setFont("Helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(0, 84, 166); const d_dev = "Developer: Kundan Yadav"; doc.textWithLink(d_dev, doc.internal.pageSize.width / 2, s, { url: "https://t.me/kundan_yadav_bot", align: "center" });
                     doc.setFont("Helvetica", "normal"); doc.setTextColor(0, 0, 0); s += 25;
@@ -806,7 +824,7 @@
                 btn.disabled = false;
                 btn.innerHTML = originalHTML;
             }
-                            }         
+                 }       
 
                 
     </script>
