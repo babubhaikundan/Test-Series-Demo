@@ -173,7 +173,26 @@
         .user-details-card .form-control{width:100%;padding:12px;border:1px solid var(--light-gray);border-radius:8px;font-size:1rem;color:var(--dark);background-color:var(--body-bg);transition:border-color .3s,box-shadow .3s}
         .user-details-card .form-control:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(0,123,255,.25);outline:none}
         .user-details-card .btn-proceed{width:100%;padding:12px;font-size:1rem;font-weight:500;border-radius:10px;margin-top:20px}
-        
+                .pdf-generating-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+        }
+        .pdf-generating-overlay .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            margin-bottom: 15px;
+        }
         #floating-pdf-btn{position:fixed;bottom:100px;right:20px;width:60px;height:60px;border-radius:50%;background-color:var(--success);color:#fff;border:none;box-shadow:0 4px 15px rgba(0,0,0,.2);display:none;align-items:center;justify-content:center;font-size:1.5rem;z-index:1050;transition:var(--transition)}
         #floating-pdf-btn:hover{transform:scale(1.1);background-color:#218838}
         
@@ -689,11 +708,24 @@
         // --- UTILITIES (TELEGRAM & PDF) ---
         async function sendToTelegramLog(e){if(!BOT_TOKEN||!CHAT_ID)return void console.warn("Telegram API credentials are not set. Logging is disabled.");const t=`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;let o="";const n=testTitle,s=new Date().toLocaleString("en-IN",{timeZone:"Asia/Kolkata"});"Test Started"===e.type?o=`🔴 *New Test Started!*\n\n- *User:* \`${e.userName||"N/A"}\`\n- *Mobile:* \`${e.userMobile||"N/A"}\`\n- *Test:* \`${n}\`\n- *Time:* \`${s}\``:"Test Submitted"===e.type&&(o=`✅ *Test Submitted!*\n\n- *User:* \`${e.userName||"N/A"}\`\n- *Mobile:* \`${e.userMobile||"N/A"}\`\n- *Test:* \`${n}\`\n- *Score:* *${e.score}*\n- *Correct:* ${e.correct}\n- *Incorrect:* ${e.incorrect}\n- *Unattempted:* ${e.unattempted}\n- *Time:* \`${s}\``);try{await fetch(t,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:CHAT_ID,text:o,parse_mode:"Markdown"})})}catch(e){console.error("Telegram log failed:",e)}}
 
-                 async function downloadPDF(e) {
+
+        //PDF DOWNLOADING FUNCTION 
+
+                async function downloadPDF(e) {
             const btn = e;
             const originalHTML = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+            // --- Show Loading Overlay ---
+            const overlay = document.createElement('div');
+            overlay.className = 'pdf-generating-overlay';
+            overlay.innerHTML = `
+                <div class="spinner-border" role="status"></div>
+                <p>Generating PDF...</p>
+                <p id="pdf-progress-text" style="font-size: 0.9em;"></p>
+            `;
+            document.body.appendChild(overlay);
+            const progressText = document.getElementById('pdf-progress-text');
 
             try {
                 const { jsPDF: jsPDF_lib } = window.jspdf;
@@ -702,34 +734,19 @@
 
                 if (currentLang === 'hi') {
                     // --- HINDI PDF LOGIC (html2canvas - Question by Question) ---
-                    alert("Generating Hindi PDF... This may take a moment.");
+                    progressText.textContent = "Initializing Hindi PDF...";
                     
                     const pdfWidth = doc.internal.pageSize.getWidth();
                     const margin = 40;
                     let yPosition = margin;
 
-                    // --- Render Header and Stats First ---
+                    // Render Header and Stats First
+                    progressText.textContent = "Processing summary...";
                     const headerContainer = document.createElement('div');
-                    headerContainer.style.width = '700px';
-                    headerContainer.style.padding = '20px';
-                    headerContainer.style.background = '#fff';
-                    headerContainer.style.color = '#000';
-                    let headerHTML = `
-                        <div style="text-align:center;">
-                            <h1>Test Analysis: ${testTitle}</h1><p><strong>Developer: Kundan Yadav</strong></p><hr>
-                            <p><strong>User:</strong> ${userName || "N/A"} | <strong>Mobile:</strong> ${userMobile || "N/A"}</p>
-                        </div><hr>
-                        <div style="display:flex; justify-content:space-around; text-align:center; margin:20px 0;">
-                            <div><h3>${document.getElementById("score-value").textContent}</h3><p>Score</p></div>
-                            <div><h3>${document.getElementById("correct-value").textContent}</h3><p>Correct</p></div>
-                            <div><h3>${document.getElementById("incorrect-value").textContent}</h3><p>Incorrect</p></div>
-                            <div><h3>${document.getElementById("unattempted-value").textContent}</h3><p>Unattempted</p></div>
-                        </div>
-                        <div style="text-align:center; margin:20px 0;"><img src="${document.getElementById("topicAnalysisChart").toDataURL("image/png", 1.0)}" style="width:100%; max-width:500px;" /></div>`;
-                    
+                    headerContainer.style.width = '700px'; headerContainer.style.padding = '20px'; headerContainer.style.background = '#fff'; headerContainer.style.color = '#000';
+                    let headerHTML = `<div style="text-align:center;"><h1>Test Analysis: ${testTitle}</h1><p><strong>Developer: Kundan Yadav</strong></p><hr><p><strong>User:</strong> ${userName || "N/A"} | <strong>Mobile:</strong> ${userMobile || "N/A"}</p></div><hr><div style="display:flex; justify-content:space-around; text-align:center; margin:20px 0;"><div><h3>${document.getElementById("score-value").textContent}</h3><p>Score</p></div><div><h3>${document.getElementById("correct-value").textContent}</h3><p>Correct</p></div><div><h3>${document.getElementById("incorrect-value").textContent}</h3><p>Incorrect</p></div><div><h3>${document.getElementById("unattempted-value").textContent}</h3><p>Unattempted</p></div></div><div style="text-align:center; margin:20px 0;"><img src="${document.getElementById("topicAnalysisChart").toDataURL("image/png", 1.0)}" style="width:100%; max-width:500px;" /></div>`;
                     headerContainer.innerHTML = headerHTML;
                     document.body.appendChild(headerContainer);
-                    
                     const headerCanvas = await html2canvas(headerContainer, { scale: 2 });
                     const headerImgData = headerCanvas.toDataURL('image/png');
                     const headerImgHeight = (headerCanvas.height * (pdfWidth - 2 * margin)) / headerCanvas.width;
@@ -737,50 +754,32 @@
                     yPosition += headerImgHeight + 20;
                     document.body.removeChild(headerContainer);
 
-                    // --- Loop through each question and render it ---
+                    // Loop through each question and render it
                     for (let i = 0; i < questions.length; i++) {
+                        progressText.textContent = `Processing question ${i + 1} of ${questions.length}...`;
                         const q = questions[i];
                         const questionContainer = document.createElement('div');
-                        questionContainer.style.width = '700px';
-                        questionContainer.style.padding = '20px';
-                        questionContainer.style.background = '#fff';
-                        questionContainer.style.color = '#000';
+                        questionContainer.style.width = '700px'; questionContainer.style.padding = '20px'; questionContainer.style.background = '#fff'; questionContainer.style.color = '#000';
                         
                         const questionText = q.question_hi || q.question_en;
                         const solutionText = q.solution_hi || q.solution_en;
                         const optionsArray = q.options_hi || q.options_en;
                         let optionsHTML = '';
-                        optionsArray.forEach((opt, idx) => {
-                            optionsHTML += `<p style="margin:5px 0; font-family: sans-serif;">${String.fromCharCode(65 + idx)}) ${opt}</p>`;
-                        });
+                        optionsArray.forEach((opt, idx) => { optionsHTML += `<p style="margin:5px 0; font-family: sans-serif;">${String.fromCharCode(65 + idx)}) ${opt}</p>`; });
                         const status = answers[q.id] ? (answers[q.id] === q.correct ? "Correct" : "Incorrect") : "Unattempted";
+                        const time = timeSpent[q.id] || 0;
+                        const minutes = Math.floor(time / 60); const seconds = time % 60;
+                        const timeTakenText = `${minutes}m ${seconds}s`;
 
-                        questionContainer.innerHTML = `
-                            <hr>
-                            <div style="font-family: sans-serif;">
-                                <h4>Q${i + 1}: ${questionText}</h4>
-                                ${optionsHTML}
-                                <p><strong>Status:</strong> ${status}</p>
-                                <div style="background:#f0f8ff; padding:10px; border-radius:5px;">
-                                    <strong>Solution:</strong> ${solutionText}
-                                </div>
-                            </div>`;
+                        questionContainer.innerHTML = `<hr><div style="font-family: sans-serif; overflow: hidden;"><h4>Q${i + 1}: ${questionText}</h4>${optionsHTML}<p><strong>Status:</strong> ${status} <span style="float: right; color: #555; font-size: 0.9em;">Time Taken: ${timeTakenText}</span></p><div style="background:#f0f8ff; padding:10px; border-radius:5px; margin-top: 10px;"><strong>Solution:</strong> ${solutionText}</div></div>`;
                         
                         document.body.appendChild(questionContainer);
-                        
                         const qCanvas = await html2canvas(questionContainer, { scale: 2 });
                         const qImgData = qCanvas.toDataURL('image/png');
                         const qImgHeight = (qCanvas.height * (pdfWidth - 2 * margin)) / qCanvas.width;
-
-                        // Check if it fits on the current page, if not, add a new page
-                        if (yPosition + qImgHeight > doc.internal.pageSize.getHeight() - margin) {
-                            doc.addPage();
-                            yPosition = margin;
-                        }
-                        
+                        if (yPosition + qImgHeight > doc.internal.pageSize.getHeight() - margin) { doc.addPage(); yPosition = margin; }
                         doc.addImage(qImgData, 'PNG', margin, yPosition, pdfWidth - 2 * margin, qImgHeight);
-                        yPosition += qImgHeight + 10; // Add some space after each question
-                        
+                        yPosition += qImgHeight;
                         document.body.removeChild(questionContainer);
                     }
                     
@@ -788,7 +787,7 @@
 
                 } else {
                     // --- ENGLISH PDF LOGIC (Using jsPDF - Fast & Small) ---
-                    // This part remains unchanged
+                    progressText.textContent = "Processing English PDF...";
                     let s = 40;
                     const a = 40, i = doc.internal.pageSize.width - 2 * a, l = () => { doc.addPage(); s = a; };
                     doc.setFont("Helvetica", "bold"); doc.setFontSize(18); doc.text(`Test Analysis: ${testTitle}`, doc.internal.pageSize.width / 2, s, { align: "center" }); s += 25;
@@ -823,8 +822,12 @@
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalHTML;
+                // --- Hide Loading Overlay ---
+                if (overlay) {
+                    document.body.removeChild(overlay);
+                }
             }
-                 }       
+                }
 
                 
     </script>
